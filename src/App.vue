@@ -8,16 +8,14 @@
         <!-- 字段 -->
         <v-col :cols="$vuetify.breakpoint.mdAndUp ? 7 : 12">
           <v-hover v-slot:default="{ hover }">
-            <!-- 需要让卡片居中 -->
             <v-card
-              :elevation="hover ? 24 : 12"
+              :elevation="hover ? 24 : 0"
               class="rounded-xl overflow-y-auto"
               :class="$vuetify.breakpoint.mdAndUp ? 'pa-10' : 'pa-5'"
-              height="80vh"
+              height="84vh"
               style="overflow-y: visible"
             >
               <h1>添加字段</h1>
-
               <v-row
                 v-for="(item, index) in query"
                 :key="item.name"
@@ -38,13 +36,10 @@
                     width="100%"
                   >
                     <!-- 按钮组 -->
-                    <v-col :cols="$vuetify.breakpoint.mdAndUp ? 2 : 4">
+                    <v-col :cols="$vuetify.breakpoint.mdAndUp ? 2 : 6">
                       <v-row class="d-flex align-center">
                         <!-- 复选框 -->
-                        <v-col
-                          :cols="$vuetify.breakpoint.mdAndUp ? 4 : 4"
-                          class="d-flex justify-center"
-                        >
+                        <v-col cols="3" class="d-flex justify-center">
                           <!-- <v-checkbox v-model="item.status"></v-checkbox> -->
                           <v-btn
                             icon
@@ -59,10 +54,7 @@
                           </v-btn>
                         </v-col>
                         <!-- 删除 -->
-                        <v-col
-                          :cols="$vuetify.breakpoint.mdAndUp ? 4 : 4"
-                          class="d-flex justify-center"
-                        >
+                        <v-col cols="3" class="d-flex justify-center">
                           <v-btn
                             icon
                             :color="item.onlock ? 'secondary' : 'danger'"
@@ -72,10 +64,7 @@
                           </v-btn>
                         </v-col>
                         <!-- 锁定 -->
-                        <v-col
-                          :cols="$vuetify.breakpoint.mdAndUp ? 4 : 4"
-                          class="d-flex justify-center"
-                        >
+                        <v-col cols="3" class="d-flex justify-center">
                           <v-btn
                             icon
                             :color="
@@ -89,7 +78,19 @@
                               item.status ? (item.onlock = !item.onlock) : ''
                             "
                           >
-                            <v-icon>mdi-lock</v-icon>
+                            <v-icon>{{
+                              item.onlock ? "mdi-lock" : "mdi-lock-open"
+                            }}</v-icon>
+                          </v-btn>
+                        </v-col>
+                        <!-- 复制 -->
+                        <v-col cols="3" class="d-flex justify-center">
+                          <v-btn
+                            icon
+                            color="primary"
+                            @click="copyQuery(`#field-textarea-${index}`)"
+                          >
+                            <v-icon>mdi-content-copy</v-icon>
                           </v-btn>
                         </v-col>
                       </v-row>
@@ -105,7 +106,8 @@
                         :disabled="!item.status"
                         :readonly="item.onlock"
                         v-model="item.content"
-                        hint="如有必要请输入连接符"
+                        :hint="item.onlock ? '' : '如有必要请输入字段名'"
+                        :id="`field-textarea-${index}`"
                       >
                       </v-text-field>
                     </v-col>
@@ -163,10 +165,10 @@
         <v-col :cols="$vuetify.breakpoint.mdAndUp ? 5 : 12">
           <v-hover v-slot:default="{ hover }">
             <v-card
-              :elevation="hover ? 24 : 12"
+              :elevation="hover ? 24 : 0"
               class="rounded-xl"
               :class="$vuetify.breakpoint.mdAndUp ? 'pa-10' : 'pa-5'"
-              height="80vh"
+              :height="$vuetify.breakpoint.mdAndUp ? '84vh' : ''"
             >
               <h1>拼接结果</h1>
               <v-hover v-slot:default="{ hover }">
@@ -176,8 +178,7 @@
                     rounded-xl
                     d-flex
                     align-center
-                    justify-end
-                    flex-wrap
+                    justify-center
                     mb-3
                     pa-4
                   "
@@ -195,105 +196,123 @@
                         no-resize
                         height="20vh"
                         id="result-textarea"
+                        readonly
                       ></v-textarea>
                     </v-col>
                     <!-- 按钮组 -->
-                    <v-col
-                      :cols="$vuetify.breakpoint.mdAndUp ? 6 : 12"
-                      class="d-flex"
-                      :class="
-                        $vuetify.breakpoint.mdAndUp
-                          ? 'justify-start'
-                          : 'justify-center'
-                      "
-                    >
+                    <v-col cols="12">
                       <v-hover v-slot:default="{ hover }">
-                        <v-btn
-                          color="primary"
-                          rounded
+                        <v-card
                           :elevation="hover ? 24 : 0"
-                          @click="toNewPage(fieldSplicer())"
+                          class="
+                            rounded-xl
+                            d-flex
+                            align-center
+                            flex-wrap
+                            mb-3
+                            pa-4
+                          "
+                          width="100%"
                         >
-                          <v-icon left>mdi-open-in-new</v-icon> 在新标签页中打开
-                        </v-btn>
+                          <v-col :cols="$vuetify.breakpoint.mdAndUp ? 6 : 12">
+                            <v-btn
+                              color="primary"
+                              rounded
+                              elevation="0"
+                              @click="toNewPage(fieldSplicer())"
+                              block
+                            >
+                              <v-icon left>mdi-open-in-new</v-icon>
+                              在新标签页中打开
+                            </v-btn>
+                          </v-col>
+                          <v-col :cols="$vuetify.breakpoint.mdAndUp ? 6 : 12">
+                            <v-btn
+                              color="primary"
+                              rounded
+                              elevation="0"
+                              @click="copyQuery('#result-textarea')"
+                              block
+                            >
+                              <v-icon left>mdi-content-copy</v-icon>
+                              复制字段到剪贴板
+                            </v-btn>
+                          </v-col>
+                          <v-col :cols="$vuetify.breakpoint.mdAndUp ? 6 : 12">
+                            <v-btn
+                              color="primary"
+                              rounded
+                              elevation="0"
+                              @click="saveJSON(query)"
+                              block
+                            >
+                              <v-icon left>mdi-export</v-icon>
+                              保存字段配置文件
+                            </v-btn>
+                          </v-col>
+                          <v-col :cols="$vuetify.breakpoint.mdAndUp ? 6 : 12">
+                            <v-file-input
+                              placeholder="上传字段配置文件"
+                              truncate-length="10"
+                              accept=".json"
+                              prepend-icon="mdi-import"
+                              :value="inputValue"
+                              disabled
+                              dense
+                            ></v-file-input>
+                          </v-col>
+                          <v-col :cols="$vuetify.breakpoint.mdAndUp ? 6 : 12">
+                            <v-btn
+                              color="secondary"
+                              rounded
+                              elevation="0"
+                              block
+                              @click="toNewPage('https://ldwid.com')"
+                            >
+                              <v-icon left>mdi-star</v-icon>
+                              访问ldwid.com
+                            </v-btn>
+                          </v-col>
+                          <v-col :cols="$vuetify.breakpoint.mdAndUp ? 6 : 12">
+                            <v-btn
+                              color="github"
+                              dark
+                              rounded
+                              elevation="0"
+                              block
+                              @click="
+                                toNewPage(
+                                  'https://github.com/LikeDreamwalker/field-splicer'
+                                )
+                              "
+                            >
+                              <v-icon left>mdi-github</v-icon>
+                              访问GitHub
+                            </v-btn>
+                          </v-col>
+                          <v-col :cols="$vuetify.breakpoint.mdAndUp ? 6 : 12">
+                            <v-btn
+                              color="primary"
+                              :dark="!$vuetify.theme.dark"
+                              rounded
+                              elevation="0"
+                              block
+                              @click="
+                                $vuetify.theme.dark = !$vuetify.theme.dark
+                              "
+                            >
+                              <v-icon left>{{
+                                $vuetify.theme.dark
+                                  ? "mdi-brightness-4"
+                                  : "mdi-brightness-7"
+                              }}</v-icon>
+                              {{
+                                $vuetify.theme.dark ? "夜间模式" : "日间模式"
+                              }}
+                            </v-btn>
+                          </v-col>
+                        </v-card>
                       </v-hover>
-                    </v-col>
-                    <v-col
-                      :cols="$vuetify.breakpoint.mdAndUp ? 6 : 12"
-                      class="d-flex"
-                      :class="
-                        $vuetify.breakpoint.mdAndUp
-                          ? 'justify-end'
-                          : 'justify-center'
-                      "
-                    >
-                      <v-hover v-slot:default="{ hover }">
-                        <v-btn
-                          color="primary"
-                          rounded
-                          :elevation="hover ? 24 : 0"
-                          @click="copyQuery()"
-                        >
-                          <v-icon left>mdi-content-copy</v-icon>
-                          复制字段到剪贴板
-                        </v-btn>
-                      </v-hover>
-                    </v-col>
-                  </v-row>
-                </v-card>
-              </v-hover>
-              <!-- 链接 -->
-              <v-hover v-slot:default="{ hover }">
-                <v-card
-                  :elevation="hover ? 24 : 0"
-                  class="
-                    rounded-xl
-                    d-flex
-                    align-center
-                    justify-center
-                    flex-wrap
-                    mb-3
-                    pa-4
-                  "
-                  width="100%"
-                >
-                  <v-card-title class="justify-center" style="padding: 0px">
-                    访问
-                    <v-btn
-                      color="primary"
-                      text
-                      @click="toNewPage('https://ldwid.com')"
-                    >
-                      ldwid.com
-                    </v-btn>
-                    以获取更多内容
-                  </v-card-title>
-                  <!-- <v-card-text>
-                    <v-btn
-                      icon
-                      color="black"
-                      @click="
-                        toNewPage(
-                          'https://github.com/LikeDreamwalker/field-splicer'
-                        )
-                      "
-                    >
-                      <v-icon>mdi-github</v-icon>
-                    </v-btn>
-                  </v-card-text> -->
-                  <v-row>
-                    <v-col cols="4">
-                      <v-btn
-                        icon
-                        @click="$vuetify.theme.dark = !$vuetify.theme.dark"
-                        :color="$vuetify.theme.dark ? 'danger' : 'primary'"
-                      >
-                        <v-icon>{{
-                          $vuetify.theme.dark
-                            ? "mdi-brightness-4"
-                            : "mdi-brightness-7"
-                        }}</v-icon>
-                      </v-btn>
                     </v-col>
                   </v-row>
                 </v-card>
@@ -301,6 +320,17 @@
             </v-card>
           </v-hover>
         </v-col>
+        <!-- 提示框 -->
+        <v-alert
+          :type="showAlert.type"
+          :color="showAlert.color"
+          elevation="24"
+          rounded="pill"
+          transition="fade-transition"
+          :value="showAlert.value"
+        >
+          {{ showAlert.content }}
+        </v-alert>
       </v-row>
     </v-main>
   </v-app>
@@ -310,9 +340,18 @@
 .v-card {
   transition: 0.3s ease-in-out;
 }
+.v-card::-webkit-scrollbar {
+  display: none;
+}
+.v-alert {
+  position: fixed !important;
+  top: 1vh;
+  right: 1vw;
+}
 </style>
 
 <script>
+import dayjs from "dayjs";
 export default {
   name: "App",
 
@@ -322,7 +361,7 @@ export default {
         name: "通过添加http/https协议支持跳转",
         content: "https://",
         status: true,
-        onlock: false,
+        onlock: true,
         clearble: false
       },
       {
@@ -340,8 +379,18 @@ export default {
         clearble: false
       }
     ],
-    fieldName: ""
+    fieldName: "",
+    showAlert: {
+      value: false,
+      type: "success",
+      content: "",
+      color: ""
+    },
+    inputValue: null
   }),
+  beforeCreate() {
+    document.title = `字段拼接器 - LikeDreamwalker 驾到`;
+  },
   methods: {
     deleteQuery(index) {
       this.query.splice(index, 1);
@@ -359,7 +408,7 @@ export default {
       if (this.fieldName !== "") {
         let field = {
           name: "",
-          content: "",
+          content: "&",
           status: true,
           onlock: false,
           clearble: false
@@ -367,15 +416,79 @@ export default {
         field.name = this.fieldName;
         this.query.push(field);
         this.fieldName = "";
+      } else if (!this.showAlert.value) {
+        this.showAlert.value = true;
+        this.showAlert.type = "error";
+        this.showAlert.content = "请填写字段名";
+        this.showAlert.color = "danger";
+        setTimeout(() => {
+          this.showAlert.value = false;
+        }, 1500);
       }
     },
-    copyQuery() {
-      const copy = document.querySelector("#result-textarea");
+    copyQuery(target) {
+      const copy = document.querySelector(target);
       copy.select();
       document.execCommand("copy");
+      if (!this.showAlert.value) {
+        this.showAlert.value = true;
+        this.showAlert.type = "success";
+        this.showAlert.content = "已复制到剪贴板";
+        this.showAlert.color = "primary";
+        setTimeout(() => {
+          this.showAlert.value = false;
+        }, 1500);
+      }
     },
     toNewPage(location) {
       window.open(location, "_blank");
+    },
+    saveJSON(data) {
+      if (!data) {
+        if (!this.showAlert.value) {
+          this.showAlert.value = true;
+          this.showAlert.type = "error";
+          this.showAlert.content = "导出字段配置文件失败";
+          this.showAlert.color = "danger";
+          setTimeout(() => {
+            this.showAlert.value = false;
+          }, 1500);
+        }
+        return;
+      }
+      this.showAlert.value = true;
+      this.showAlert.type = "success";
+      this.showAlert.content = "导出字段配置文件成功";
+      this.showAlert.color = "primary";
+      setTimeout(() => {
+        this.showAlert.value = false;
+      }, 1500);
+      const filename = `字段配置文件_${dayjs().format("MM-DD-HH:mm:ss")}.json`;
+      data = JSON.stringify(data, undefined, 4);
+      let blob = new Blob([data], { type: "text/json" }),
+        e = document.createEvent("MouseEvents"),
+        a = document.createElement("a");
+      a.download = filename;
+      a.href = window.URL.createObjectURL(blob);
+      a.dataset.downloadurl = ["text/json", a.download, a.href].join(":");
+      e.initMouseEvent(
+        "click",
+        true,
+        false,
+        window,
+        0,
+        0,
+        0,
+        0,
+        0,
+        false,
+        false,
+        false,
+        false,
+        0,
+        null
+      );
+      a.dispatchEvent(e);
     }
   }
 };
