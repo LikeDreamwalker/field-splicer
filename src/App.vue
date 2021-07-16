@@ -262,6 +262,7 @@
                               v-model="upLoadJSON"
                               @change="importJSON()"
                               chips
+                              accept=".json"
                             >
                             </v-file-input>
                           </v-col>
