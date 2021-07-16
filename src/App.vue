@@ -12,8 +12,7 @@
               :elevation="hover ? 24 : 0"
               class="rounded-xl overflow-y-auto"
               :class="$vuetify.breakpoint.mdAndUp ? 'pa-10' : 'pa-5'"
-              height="84vh"
-              style="overflow-y: visible"
+              :height="$vuetify.breakpoint.mdAndUp ? '84vh' : ''"
             >
               <h1>添加字段</h1>
               <v-row
@@ -152,6 +151,10 @@
                         v-model="fieldName"
                         :clearable="fieldName !== null"
                         hint="字段名不是字段内容的一部分"
+                        :error="
+                          showAlert.value &&
+                          showAlert.content === '请填写字段名'
+                        "
                       >
                       </v-text-field>
                     </v-col>
@@ -254,16 +257,17 @@
                             <v-file-input
                               placeholder="上传字段配置文件"
                               truncate-length="10"
-                              accept=".json"
                               prepend-icon="mdi-import"
-                              :value="inputValue"
-                              disabled
                               dense
-                            ></v-file-input>
+                              v-model="upLoadJSON"
+                              @change="importJSON()"
+                              chips
+                            >
+                            </v-file-input>
                           </v-col>
                           <v-col :cols="$vuetify.breakpoint.mdAndUp ? 6 : 12">
                             <v-btn
-                              color="secondary"
+                              color="info"
                               rounded
                               elevation="0"
                               block
@@ -386,8 +390,10 @@ export default {
       content: "",
       color: ""
     },
-    inputValue: null
+    upLoadJSON: null,
+    upLoadJSONContent: null
   }),
+
   beforeCreate() {
     document.title = `字段拼接器 - LikeDreamwalker 驾到`;
   },
@@ -407,62 +413,33 @@ export default {
     newField() {
       if (this.fieldName !== "") {
         let field = {
-          name: "",
-          content: "&",
+          name: this.fieldName,
+          content: `&${this.fieldName}=`,
           status: true,
           onlock: false,
-          clearble: false
+          clearble: true
         };
-        field.name = this.fieldName;
         this.query.push(field);
         this.fieldName = "";
-      } else if (!this.showAlert.value) {
-        this.showAlert.value = true;
-        this.showAlert.type = "error";
-        this.showAlert.content = "请填写字段名";
-        this.showAlert.color = "danger";
-        setTimeout(() => {
-          this.showAlert.value = false;
-        }, 1500);
+      } else {
+        this.setAlert("error", "请填写字段名", "danger");
       }
     },
     copyQuery(target) {
       const copy = document.querySelector(target);
       copy.select();
       document.execCommand("copy");
-      if (!this.showAlert.value) {
-        this.showAlert.value = true;
-        this.showAlert.type = "success";
-        this.showAlert.content = "已复制到剪贴板";
-        this.showAlert.color = "primary";
-        setTimeout(() => {
-          this.showAlert.value = false;
-        }, 1500);
-      }
+      this.setAlert("success", "已复制到剪贴板", "primary");
     },
     toNewPage(location) {
       window.open(location, "_blank");
     },
     saveJSON(data) {
       if (!data) {
-        if (!this.showAlert.value) {
-          this.showAlert.value = true;
-          this.showAlert.type = "error";
-          this.showAlert.content = "导出字段配置文件失败";
-          this.showAlert.color = "danger";
-          setTimeout(() => {
-            this.showAlert.value = false;
-          }, 1500);
-        }
+        this.setAlert("error", "导出字段配置文件失败", "danger");
         return;
       }
-      this.showAlert.value = true;
-      this.showAlert.type = "success";
-      this.showAlert.content = "导出字段配置文件成功";
-      this.showAlert.color = "primary";
-      setTimeout(() => {
-        this.showAlert.value = false;
-      }, 1500);
+      this.setAlert("success", "导出字段配置文件成功，即将开始下载", "primary");
       const filename = `字段配置文件_${dayjs().format("MM-DD-HH:mm:ss")}.json`;
       data = JSON.stringify(data, undefined, 4);
       let blob = new Blob([data], { type: "text/json" }),
@@ -489,6 +466,48 @@ export default {
         null
       );
       a.dispatchEvent(e);
+    },
+    importJSON() {
+      if (this.upLoadJSON !== null) {
+        let reader = new FileReader();
+        reader.readAsText(this.upLoadJSON);
+        reader.onload = () => {
+          // todo 需要校验
+          if (reader.result !== "") {
+            this.upLoadJSONContent = JSON.parse(reader.result);
+            this.query = [];
+            for (
+              let index = 0;
+              index < this.upLoadJSONContent.length;
+              index++
+            ) {
+              this.query[index] = this.upLoadJSONContent[index];
+              this.upLoadJSONContent[index] = null;
+            }
+            this.setAlert("success", "导入字段配置文件成功", "primary");
+          } else {
+            this.setAlert(
+              "error",
+              "上传字段配置文件失败，请不要导入自定义的.json文件",
+              "danger"
+            );
+            return;
+          }
+        };
+      } else {
+        this.setAlert("info", "未导入文件", "info");
+      }
+    },
+    setAlert(type, content, color) {
+      if (!this.showAlert.value) {
+        this.showAlert.value = true;
+        this.showAlert.type = type;
+        this.showAlert.content = content;
+        this.showAlert.color = color;
+        setTimeout(() => {
+          this.showAlert.value = false;
+        }, 1500);
+      }
     }
   }
 };
