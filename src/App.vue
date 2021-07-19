@@ -105,7 +105,7 @@
                         :disabled="!item.status"
                         :readonly="item.onlock"
                         v-model="item.content"
-                        :hint="item.onlock ? '' : '如有必要请输入字段名'"
+                        :hint="item.onlock ? '' : '请注意连接符'"
                         :id="`field-textarea-${index}`"
                       >
                       </v-text-field>
@@ -150,7 +150,7 @@
                         rounded
                         v-model="fieldName"
                         :clearable="fieldName !== null"
-                        hint="字段名不是字段内容的一部分"
+                        hint="字段名将被自动填充并连接"
                         :error="
                           showAlert.value &&
                           showAlert.content === '请填写字段名'
@@ -370,15 +370,15 @@ export default {
         clearble: false
       },
       {
-        name: "访问ldwid.com以了解更多",
-        content: "mirrorlake.",
+        name: "url",
+        content: "ldwid.com?",
         status: true,
         onlock: false,
         clearble: false
       },
       {
-        name: "LikeDreamwalker",
-        content: "ldwid.com",
+        name: "token",
+        content: "&token=fakeTokenAndYouCantJumpToThisPageCauseLdwidDoesntNeedAToken",
         status: true,
         onlock: false,
         clearble: false
@@ -469,12 +469,16 @@ export default {
       a.dispatchEvent(e);
     },
     importJSON() {
+      // upLoadJSON是文件列表
       if (this.upLoadJSON !== null) {
+        // 声明一个reader
         let reader = new FileReader();
+        // 以文本方式读取文件
         reader.readAsText(this.upLoadJSON);
         reader.onload = () => {
           // todo 需要校验
           if (reader.result !== "") {
+            // 将文本（字符串）转化为JSON
             this.upLoadJSONContent = JSON.parse(reader.result);
             this.query = [];
             for (
