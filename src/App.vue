@@ -367,32 +367,33 @@ export default {
         content: "https://",
         status: true,
         onlock: true,
-        clearble: false
+        clearble: false,
       },
       {
         name: "url",
         content: "ldwid.com?",
         status: true,
         onlock: false,
-        clearble: false
+        clearble: false,
       },
       {
         name: "token",
-        content: "&token=fakeTokenAndYouCantJumpToThisPageCauseLdwidDoesntNeedAToken",
+        content:
+          "&token=fakeTokenAndYouCantJumpToThisPageCauseLdwidDoesntNeedAToken",
         status: true,
         onlock: false,
-        clearble: false
-      }
+        clearble: false,
+      },
     ],
     fieldName: "",
     showAlert: {
       value: false,
       type: "success",
       content: "",
-      color: ""
+      color: "",
     },
     upLoadJSON: null,
-    upLoadJSONContent: null
+    upLoadJSONContent: null,
   }),
 
   beforeCreate() {
@@ -418,7 +419,7 @@ export default {
           content: `&${this.fieldName}=`,
           status: true,
           onlock: false,
-          clearble: true
+          clearble: true,
         };
         this.query.push(field);
         this.fieldName = "";
@@ -440,8 +441,15 @@ export default {
         this.setAlert("error", "导出字段配置文件失败", "danger");
         return;
       }
+      let filename = "";
       this.setAlert("success", "导出字段配置文件成功，即将开始下载", "primary");
-      const filename = `字段配置文件_${dayjs().format("MM-DD-HH:mm:ss")}.json`;
+      if (this.query[1].name === "url" && this.query[1].content !== "") {
+        filename = `${this.query[1].content}${dayjs().format(
+          "MM-DD-HH:mm:ss"
+        )}.json`;
+      } else {
+        filename = `字段配置文件_${dayjs().format("MM-DD-HH:mm:ss")}.json`;
+      }
       data = JSON.stringify(data, undefined, 4);
       let blob = new Blob([data], { type: "text/json" }),
         e = document.createEvent("MouseEvents"),
@@ -513,7 +521,7 @@ export default {
           this.showAlert.value = false;
         }, 1500);
       }
-    }
-  }
+    },
+  },
 };
 </script>
