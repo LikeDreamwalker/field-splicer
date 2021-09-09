@@ -359,7 +359,6 @@
 import dayjs from "dayjs";
 export default {
   name: "App",
-
   data: () => ({
     query: [
       {
@@ -395,9 +394,30 @@ export default {
     upLoadJSON: null,
     upLoadJSONContent: null,
   }),
-
   beforeCreate() {
     document.title = `字段拼接器 - LikeDreamwalker 驾到`;
+  },
+  created() {
+    // NOTE 注意this指向
+    const _this = this;
+    const listeners = {
+      dark: function (mediaQueryList) {
+        if (mediaQueryList.matches) {
+          _this.$vuetify.theme.dark = true;
+        }
+      },
+      light: function (mediaQueryList) {
+        if (mediaQueryList.matches) {
+          _this.$vuetify.theme.dark = false;
+        }
+      },
+    };
+    window
+      .matchMedia("(prefers-color-scheme: dark)")
+      .addListener(listeners.dark);
+    window
+      .matchMedia("(prefers-color-scheme: light)")
+      .addListener(listeners.light);
   },
   methods: {
     deleteQuery(index) {
