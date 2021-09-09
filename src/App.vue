@@ -246,7 +246,7 @@
                               color="primary"
                               rounded
                               elevation="0"
-                              @click="saveJSON(query)"
+                              @click="showOverlayFunction()"
                               block
                             >
                               <v-icon left>mdi-export</v-icon>
@@ -333,9 +333,71 @@
           rounded="pill"
           transition="fade-transition"
           :value="showAlert.value"
+          style="z-index: 6"
         >
           {{ showAlert.content }}
         </v-alert>
+        <!-- overlay -->
+        <v-fade-transition>
+          <!-- NOTE overlay默认使用dark -->
+          <v-overlay
+            v-if="showOverlay"
+            :value="showOverlay"
+            style="backdrop-filter: blur(1rem)"
+            :color="$vuetify.theme.dark ? '#00000062' : '#FFFFFF62'"
+            :dark="$vuetify.theme.dark"
+          >
+            <div
+              :style="
+                $vuetify.breakpoint.mdAndUp ? 'width: 50vw' : 'width: 80vw'
+              "
+            >
+              <v-row class="align-baseline">
+                <v-col cols="12">
+                  <v-text-field
+                    clearable
+                    label="请输入文件名"
+                    counter
+                    filled
+                    rounded
+                    v-model="fileName"
+                    hint="不需要后缀名"
+                  >
+                  </v-text-field>
+                </v-col>
+                <v-col cols="12">
+                  <v-row class="justify-space-between">
+                    <v-col cols="4">
+                      <v-btn
+                        color="primary"
+                        rounded
+                        elevation="0"
+                        @click="saveJSON(query)"
+                        block
+                      >
+                        <v-icon left>mdi-export</v-icon>
+                        确定！
+                      </v-btn>
+                    </v-col>
+                    <v-col cols="4">
+                      <v-btn
+                        color="danger"
+                        rounded
+                        elevation="0"
+                        @click="showOverlay = false"
+                        block
+                        class="white--text"
+                      >
+                        <v-icon left>mdi-cancel</v-icon>
+                        我再想想……
+                      </v-btn>
+                    </v-col>
+                  </v-row>
+                </v-col>
+              </v-row>
+            </div>
+          </v-overlay>
+        </v-fade-transition>
       </v-row>
     </v-main>
   </v-app>
@@ -393,6 +455,9 @@ export default {
     },
     upLoadJSON: null,
     upLoadJSONContent: null,
+    showOverlay: false,
+    fileName: "",
+    exportFileName: "",
   }),
   beforeCreate() {
     document.title = `字段拼接器 - LikeDreamwalker 驾到`;
@@ -457,24 +522,22 @@ export default {
       window.open(location, "_blank");
     },
     saveJSON(data) {
-      if (!data) {
-        this.setAlert("error", "导出字段配置文件失败", "danger");
+      if (data.length === 0) {
+        this.setAlert("error", "空字段就不导出了吧", "danger");
         return;
       }
-      let filename = "";
-      this.setAlert("success", "导出字段配置文件成功，即将开始下载", "primary");
-      if (this.query[1].name === "url" && this.query[1].content !== "") {
-        filename = `${this.query[1].content}${dayjs().format(
-          "MM-DD-HH:mm:ss"
-        )}.json`;
-      } else {
-        filename = `字段配置文件_${dayjs().format("MM-DD-HH:mm:ss")}.json`;
+      if (!this.fileName) {
+        this.setAlert("error", "请填写文件名", "danger");
+        return;
       }
+      this.exportFileName = `${this.fileName}.json`;
+      this.showOverlay = false;
+      this.setAlert("success", "导出字段配置文件成功，即将开始下载", "primary");
       data = JSON.stringify(data, undefined, 4);
       let blob = new Blob([data], { type: "text/json" }),
         e = document.createEvent("MouseEvents"),
         a = document.createElement("a");
-      a.download = filename;
+      a.download = this.exportFileName;
       a.href = window.URL.createObjectURL(blob);
       a.dataset.downloadurl = ["text/json", a.download, a.href].join(":");
       e.initMouseEvent(
@@ -529,6 +592,16 @@ export default {
         };
       } else {
         this.setAlert("info", "未导入文件", "info");
+      }
+    },
+    showOverlayFunction() {
+      this.showOverlay = true;
+      if (this.query[1].name === "url" && this.query[1].content !== "") {
+        this.fileName = `${this.query[1].content}${dayjs().format(
+          "MM-DD-HH:mm:ss"
+        )}`;
+      } else {
+        this.fileName = `字段配置文件_${dayjs().format("MM-DD-HH:mm:ss")}`;
       }
     },
     setAlert(type, content, color) {
