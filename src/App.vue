@@ -1,18 +1,15 @@
 <template>
   <v-app>
-    <v-main
-      :class="$vuetify.breakpoint.mdAndUp ? 'pa-15' : 'pa-7'"
-      class="d-flex align-center"
-    >
+    <v-main :class="mdAndUp ? 'pa-15' : 'pa-7'" class="d-flex align-center">
       <v-row>
-        <!-- 字段 -->
-        <v-col :cols="$vuetify.breakpoint.mdAndUp ? 7 : 12">
-          <v-hover v-slot:default="{ hover }">
+        <v-col :cols="mdAndUp ? 7 : 12">
+          <v-hover v-slot="{ isHovering, props }">
             <v-card
-              :elevation="hover ? 24 : 0"
+              :elevation="isHovering ? 24 : 0"
               class="rounded-xl overflow-y-auto"
-              :class="$vuetify.breakpoint.mdAndUp ? 'pa-10' : 'pa-5'"
-              :height="$vuetify.breakpoint.mdAndUp ? '84vh' : ''"
+              :class="mdAndUp ? 'pa-10' : 'pa-5'"
+              :height="mdAndUp ? '84vh' : ''"
+              v-bind="props"
             >
               <h1>添加字段</h1>
               <v-row
@@ -20,14 +17,15 @@
                 :key="item.name"
                 style="margin: 0px"
               >
-                <v-hover v-slot:default="{ hover }">
+                <v-hover v-slot="{ isHovering, props }">
                   <v-card
-                    :elevation="hover ? 24 : 0"
+                    :elevation="isHovering ? 24 : 0"
                     class="rounded-xl d-flex align-center justify-end flex-wrap mb-3 pa-1"
                     width="100%"
+                    v-bind="props"
                   >
                     <!-- 按钮组 -->
-                    <v-col :cols="$vuetify.breakpoint.mdAndUp ? 2 : 6">
+                    <v-col :cols="mdAndUp ? 2 : 6">
                       <v-row class="d-flex align-center">
                         <!-- 复选框 -->
                         <v-col cols="3" class="d-flex justify-center">
@@ -87,7 +85,7 @@
                       </v-row>
                     </v-col>
                     <!-- 内容 -->
-                    <v-col :cols="$vuetify.breakpoint.mdAndUp ? 10 : 12">
+                    <v-col :cols="mdAndUp ? 10 : 12">
                       <v-text-field
                         :clearable="!item.onlock && item.content !== ''"
                         :label="item.name"
@@ -107,17 +105,18 @@
               </v-row>
               <!-- 新建 -->
               <v-row style="margin: 0px">
-                <v-hover v-slot:default="{ hover }">
+                <v-hover v-slot="{ isHovering, props }">
                   <v-card
-                    :elevation="hover ? 24 : 0"
+                    :elevation="isHovering ? 24 : 0"
                     class="rounded-xl d-flex align-center justify-end flex-wrap mb-3 pa-1"
                     width="100%"
+                    v-bind="props"
                   >
                     <!-- 新建按钮 -->
-                    <v-col :cols="$vuetify.breakpoint.mdAndUp ? 2 : 4">
+                    <v-col :cols="mdAndUp ? 2 : 4">
                       <v-row class="d-flex align-center justify-center">
                         <v-col
-                          :cols="$vuetify.breakpoint.mdAndUp ? 4 : 4"
+                          :cols="mdAndUp ? 4 : 4"
                           class="d-flex justify-center"
                         >
                           <v-btn icon color="primary" x-large @click="newField">
@@ -126,7 +125,7 @@
                         </v-col>
                       </v-row>
                     </v-col>
-                    <v-col :cols="$vuetify.breakpoint.mdAndUp ? 10 : 12">
+                    <v-col :cols="mdAndUp ? 10 : 12">
                       <v-text-field
                         label="请输入字段名"
                         counter
@@ -149,151 +148,144 @@
           </v-hover>
         </v-col>
         <!-- 拼接结果 -->
-        <v-col :cols="$vuetify.breakpoint.mdAndUp ? 5 : 12">
-          <v-hover v-slot:default="{ hover }">
+        <v-col :cols="mdAndUp ? 5 : 12">
+          <v-card
+            :elevation="isHovering ? 24 : 0"
+            class="rounded-xl"
+            :class="mdAndUp ? 'pa-10' : 'pa-5'"
+            :height="mdAndUp ? '84vh' : ''"
+            v-bind="props"
+          >
+            <h1>拼接结果</h1>
             <v-card
-              :elevation="hover ? 24 : 0"
-              class="rounded-xl"
-              :class="$vuetify.breakpoint.mdAndUp ? 'pa-10' : 'pa-5'"
-              :height="$vuetify.breakpoint.mdAndUp ? '84vh' : ''"
+              :elevation="isHovering ? 24 : 0"
+              class="rounded-xl d-flex align-center justify-center mb-3 pa-4"
+              width="100%"
+              style="overflow-y: visible"
+              v-bind="props"
             >
-              <h1>拼接结果</h1>
-              <v-hover v-slot:default="{ hover }">
-                <v-card
-                  :elevation="hover ? 24 : 0"
-                  class="rounded-xl d-flex align-center justify-center mb-3 pa-4"
-                  width="100%"
-                  style="overflow-y: visible"
-                >
-                  <v-row>
-                    <!-- 多行文本框 -->
-                    <v-col cols="12">
-                      <v-textarea
-                        :value="fieldSplicer()"
-                        filled
+              <v-row>
+                <!-- 多行文本框 -->
+                <v-col cols="12">
+                  <v-textarea
+                    :value="fieldSplicer()"
+                    filled
+                    rounded
+                    counter
+                    no-resize
+                    height="20vh"
+                    id="result-textarea"
+                    readonly
+                  ></v-textarea>
+                </v-col>
+                <!-- 按钮组 -->
+                <v-col cols="12">
+                  <v-card
+                    :elevation="isHovering ? 24 : 0"
+                    class="rounded-xl d-flex align-center flex-wrap mb-3 pa-4"
+                    width="100%"
+                    v-bind="props"
+                  >
+                    <v-col :cols="mdAndUp ? 6 : 12">
+                      <v-btn
+                        color="primary"
                         rounded
-                        counter
-                        no-resize
-                        height="20vh"
-                        id="result-textarea"
-                        readonly
-                      ></v-textarea>
+                        elevation="0"
+                        @click="toNewPage(fieldSplicer())"
+                        block
+                      >
+                        <v-icon left>mdi-open-in-new</v-icon>
+                        在新标签页中打开
+                      </v-btn>
                     </v-col>
-                    <!-- 按钮组 -->
-                    <v-col cols="12">
-                      <v-hover v-slot:default="{ hover }">
-                        <v-card
-                          :elevation="hover ? 24 : 0"
-                          class="rounded-xl d-flex align-center flex-wrap mb-3 pa-4"
-                          width="100%"
-                        >
-                          <v-col :cols="$vuetify.breakpoint.mdAndUp ? 6 : 12">
-                            <v-btn
-                              color="primary"
-                              rounded
-                              elevation="0"
-                              @click="toNewPage(fieldSplicer())"
-                              block
-                            >
-                              <v-icon left>mdi-open-in-new</v-icon>
-                              在新标签页中打开
-                            </v-btn>
-                          </v-col>
-                          <v-col :cols="$vuetify.breakpoint.mdAndUp ? 6 : 12">
-                            <v-btn
-                              color="primary"
-                              rounded
-                              elevation="0"
-                              @click="copyQuery('#result-textarea')"
-                              block
-                            >
-                              <v-icon left>mdi-content-copy</v-icon>
-                              复制字段到剪贴板
-                            </v-btn>
-                          </v-col>
-                          <v-col :cols="$vuetify.breakpoint.mdAndUp ? 6 : 12">
-                            <v-btn
-                              color="primary"
-                              rounded
-                              elevation="0"
-                              @click="showOverlayFunction()"
-                              block
-                            >
-                              <v-icon left>mdi-export</v-icon>
-                              保存字段配置文件
-                            </v-btn>
-                          </v-col>
-                          <v-col :cols="$vuetify.breakpoint.mdAndUp ? 6 : 12">
-                            <v-file-input
-                              placeholder="上传字段配置文件"
-                              truncate-length="10"
-                              prepend-icon="mdi-import"
-                              dense
-                              v-model="upLoadJSON"
-                              @change="importJSON()"
-                              chips
-                              accept=".json"
-                            >
-                            </v-file-input>
-                          </v-col>
-                          <v-col :cols="$vuetify.breakpoint.mdAndUp ? 6 : 12">
-                            <v-btn
-                              color="info"
-                              rounded
-                              elevation="0"
-                              block
-                              @click="toNewPage('https://ldwid.com')"
-                            >
-                              <v-icon left>mdi-star</v-icon>
-                              访问ldwid.com
-                            </v-btn>
-                          </v-col>
-                          <v-col :cols="$vuetify.breakpoint.mdAndUp ? 6 : 12">
-                            <v-btn
-                              color="github"
-                              dark
-                              rounded
-                              elevation="0"
-                              block
-                              @click="
-                                toNewPage(
-                                  'https://github.com/LikeDreamwalker/field-splicer'
-                                )
-                              "
-                            >
-                              <v-icon left>mdi-github</v-icon>
-                              访问GitHub
-                            </v-btn>
-                          </v-col>
-                          <v-col :cols="$vuetify.breakpoint.mdAndUp ? 6 : 12">
-                            <v-btn
-                              color="primary"
-                              :dark="!$vuetify.theme.dark"
-                              rounded
-                              elevation="0"
-                              block
-                              @click="
-                                $vuetify.theme.dark = !$vuetify.theme.dark
-                              "
-                            >
-                              <v-icon left>{{
-                                $vuetify.theme.dark
-                                  ? "mdi-brightness-4"
-                                  : "mdi-brightness-7"
-                              }}</v-icon>
-                              {{
-                                $vuetify.theme.dark ? "夜间模式" : "日间模式"
-                              }}
-                            </v-btn>
-                          </v-col>
-                        </v-card>
-                      </v-hover>
+                    <v-col :cols="mdAndUp ? 6 : 12">
+                      <v-btn
+                        color="primary"
+                        rounded
+                        elevation="0"
+                        @click="copyQuery('#result-textarea')"
+                        block
+                      >
+                        <v-icon left>mdi-content-copy</v-icon>
+                        复制字段到剪贴板
+                      </v-btn>
                     </v-col>
-                  </v-row>
-                </v-card>
-              </v-hover>
+                    <v-col :cols="mdAndUp ? 6 : 12">
+                      <v-btn
+                        color="primary"
+                        rounded
+                        elevation="0"
+                        @click="showOverlayFunction()"
+                        block
+                      >
+                        <v-icon left>mdi-export</v-icon>
+                        保存字段配置文件
+                      </v-btn>
+                    </v-col>
+                    <v-col :cols="mdAndUp ? 6 : 12">
+                      <v-file-input
+                        placeholder="上传字段配置文件"
+                        truncate-length="10"
+                        prepend-icon="mdi-import"
+                        dense
+                        v-model="upLoadJSON"
+                        @change="importJSON()"
+                        chips
+                        accept=".json"
+                      >
+                      </v-file-input>
+                    </v-col>
+                    <v-col :cols="mdAndUp ? 6 : 12">
+                      <v-btn
+                        color="info"
+                        rounded
+                        elevation="0"
+                        block
+                        @click="toNewPage('https://ldwid.com')"
+                      >
+                        <v-icon left>mdi-star</v-icon>
+                        访问ldwid.com
+                      </v-btn>
+                    </v-col>
+                    <v-col :cols="mdAndUp ? 6 : 12">
+                      <v-btn
+                        color="github"
+                        dark
+                        rounded
+                        elevation="0"
+                        block
+                        @click="
+                          toNewPage(
+                            'https://github.com/LikeDreamwalker/field-splicer'
+                          )
+                        "
+                      >
+                        <v-icon left>mdi-github</v-icon>
+                        访问GitHub
+                      </v-btn>
+                    </v-col>
+                    <v-col :cols="mdAndUp ? 6 : 12">
+                      <v-btn
+                        color="primary"
+                        :dark="!$vuetify.theme.dark"
+                        rounded
+                        elevation="0"
+                        block
+                        @click="$vuetify.theme.dark = !$vuetify.theme.dark"
+                      >
+                        <v-icon left>{{
+                          $vuetify.theme.dark
+                            ? "mdi-brightness-4"
+                            : "mdi-brightness-7"
+                        }}</v-icon>
+                        {{ $vuetify.theme.dark ? "夜间模式" : "日间模式" }}
+                      </v-btn>
+                    </v-col>
+                  </v-card>
+                </v-col>
+              </v-row>
             </v-card>
-          </v-hover>
+          </v-card>
         </v-col>
         <!-- 提示框 -->
         <v-alert
@@ -307,92 +299,77 @@
         >
           {{ showAlert.content }}
         </v-alert>
+
         <!-- overlay -->
-        <v-fade-transition>
-          <!-- NOTE overlay默认使用dark -->
-          <v-overlay
-            v-if="showOverlay"
-            :value="showOverlay"
-            style="backdrop-filter: blur(1rem)"
-            :color="$vuetify.theme.dark ? '#00000062' : '#FFFFFF62'"
-            :dark="$vuetify.theme.dark"
+        <v-overlay
+          v-if="showOverlay"
+          :value="showOverlay"
+          style="backdrop-filter: blur(1rem)"
+          :class="{ dark: $vuetify.theme.dark }"
+        >
+          <div
+            :style="{
+              width: mdAndUp ? '50vw' : '80vw',
+            }"
           >
-            <div
-              :style="
-                $vuetify.breakpoint.mdAndUp ? 'width: 50vw' : 'width: 80vw'
-              "
-            >
-              <v-row class="align-baseline">
-                <v-col cols="12">
-                  <v-text-field
-                    clearable
-                    label="请输入文件名"
-                    counter
-                    filled
-                    rounded
-                    v-model="fileName"
-                    hint="不需要后缀名"
-                  >
-                  </v-text-field>
-                </v-col>
-                <v-col cols="12">
-                  <v-row class="justify-space-between">
-                    <v-col cols="4">
-                      <v-btn
-                        color="primary"
-                        rounded
-                        elevation="0"
-                        @click="saveJSON(query)"
-                        block
-                      >
-                        <v-icon left>mdi-export</v-icon>
-                        确定！
-                      </v-btn>
-                    </v-col>
-                    <v-col cols="4">
-                      <v-btn
-                        color="danger"
-                        rounded
-                        elevation="0"
-                        @click="showOverlay = false"
-                        block
-                        class="white--text"
-                      >
-                        <v-icon left>mdi-cancel</v-icon>
-                        我再想想……
-                      </v-btn>
-                    </v-col>
-                  </v-row>
-                </v-col>
-              </v-row>
-            </div>
-          </v-overlay>
-        </v-fade-transition>
+            <v-row class="align-baseline">
+              <v-col cols="12">
+                <v-text-field
+                  clearable
+                  label="请输入文件名"
+                  counter
+                  filled
+                  rounded
+                  v-model="fileName"
+                  hint="不需要后缀名"
+                >
+                </v-text-field>
+              </v-col>
+              <v-col cols="12">
+                <v-row class="justify-space-between">
+                  <v-col cols="4">
+                    <v-btn
+                      color="primary"
+                      rounded
+                      elevation="0"
+                      @click="saveJSON(query)"
+                      block
+                    >
+                      <v-icon left>mdi-export</v-icon>
+                      确定！
+                    </v-btn>
+                  </v-col>
+                  <v-col cols="4">
+                    <v-btn
+                      color="danger"
+                      rounded
+                      elevation="0"
+                      @click="showOverlay = false"
+                      block
+                      class="white--text"
+                    >
+                      <v-icon left>mdi-cancel</v-icon>
+                      我再想想……
+                    </v-btn>
+                  </v-col>
+                </v-row>
+              </v-col>
+            </v-row>
+          </div>
+        </v-overlay>
       </v-row>
     </v-main>
   </v-app>
 </template>
 
-<style>
-.v-card {
-  transition: 0.3s ease-in-out;
-}
-.v-card::-webkit-scrollbar {
-  display: none;
-}
-.v-alert {
-  position: fixed !important;
-  top: 1vh;
-  right: 1vw;
-}
-</style>
-
 <script>
 import dayjs from "dayjs";
+import { ref } from "vue";
+import { useDisplay } from "vuetify";
 export default {
-  name: "App",
-  data: () => ({
-    query: [
+  setup() {
+    const { mdAndUp } = useDisplay();
+    const query = ref([
       {
         name: "通过添加http/https协议支持跳转",
         content: "https://",
@@ -415,24 +392,21 @@ export default {
         onlock: false,
         clearble: false,
       },
-    ],
-    fieldName: "",
-    showAlert: {
+    ]);
+    const fileName = ref("");
+    const fieldName = ref("");
+    const showAlert = ref({
       value: false,
-      type: "success",
-      content: "",
+      content: "success",
+      type: "",
       color: "",
-    },
-    upLoadJSON: null,
-    upLoadJSONContent: null,
-    showOverlay: false,
-    fileName: "",
-    exportFileName: "",
-  }),
-  beforeCreate() {
-    document.title = `字段拼接器 - LikeDreamwalker 驾到`;
-  },
-  created() {
+    });
+    const upLoadJSON = ref(null);
+    const upLoadJSONContent = ref(null);
+    const showOverlay = ref(false);
+    const exportFileName = ref("");
+
+    document.title = "URL解析 - LikeDreamwalker";
     // NOTE 注意this指向
     const _this = this;
     const listeners = {
@@ -453,61 +427,59 @@ export default {
     window
       .matchMedia("(prefers-color-scheme: light)")
       .addListener(listeners.light);
-  },
-  methods: {
-    deleteQuery(index) {
-      this.query.splice(index, 1);
-    },
-    fieldSplicer() {
+    const deleteQuery = (index) => {
+      query.value.splice(index, 1);
+    };
+    const fieldSplicer = () => {
       let result = "";
-      for (const item of this.query) {
+      query.value.forEach((item) => {
         if (item.status && item.content !== null) {
           result += item.content;
         }
-      }
+      });
       return result;
-    },
-    newField() {
-      if (this.fieldName !== "") {
+    };
+    const newField = () => {
+      if (fieldName.value !== "") {
         let field = {
-          name: this.fieldName,
-          content: `&${this.fieldName}=`,
+          name: fieldName,
+          content: `&${fieldName.value}=`,
           status: true,
           onlock: false,
           clearble: true,
         };
-        this.query.push(field);
-        this.fieldName = "";
+        query.value.push(field);
+        fieldName.value = "";
       } else {
-        this.setAlert("error", "请填写字段名", "danger");
+        setAlert("error", "请填写字段名", "danger");
       }
-    },
-    copyQuery(target) {
+    };
+    const copyQuery = (target) => {
       const copy = document.querySelector(target);
       copy.select();
       document.execCommand("copy");
-      this.setAlert("success", "已复制到剪贴板", "primary");
-    },
-    toNewPage(location) {
+      setAlert("success", "已复制到剪贴板", "primary");
+    };
+    const toNewPage = (location) => {
       window.open(location, "_blank");
-    },
-    saveJSON(data) {
+    };
+    const saveJSON = (data) => {
       if (data.length === 0) {
-        this.setAlert("error", "空字段就不导出了吧", "danger");
+        setAlert("error", "空字段就不导出了吧", "danger");
         return;
       }
-      if (!this.fileName) {
-        this.setAlert("error", "请填写文件名", "danger");
+      if (!fileName.value) {
+        setAlert("error", "请填写文件名", "danger");
         return;
       }
-      this.exportFileName = `${this.fileName}.json`;
-      this.showOverlay = false;
-      this.setAlert("success", "导出字段配置文件成功，即将开始下载", "primary");
+      exportFileName.value = `${fileName.value}.json`;
+      showOverlay.value = false;
+      setAlert("success", "导出字段配置文件成功，即将开始下载", "primary");
       data = JSON.stringify(data, undefined, 4);
       let blob = new Blob([data], { type: "text/json" }),
         e = document.createEvent("MouseEvents"),
         a = document.createElement("a");
-      a.download = this.exportFileName;
+      a.download = exportFileName;
       a.href = window.URL.createObjectURL(blob);
       a.dataset.downloadurl = ["text/json", a.download, a.href].join(":");
       e.initMouseEvent(
@@ -528,31 +500,31 @@ export default {
         null
       );
       a.dispatchEvent(e);
-    },
-    importJSON() {
+    };
+    const importJSON = () => {
       // upLoadJSON是文件列表
-      if (this.upLoadJSON !== null) {
+      if (upLoadJSON.value !== null) {
         // 声明一个reader
         let reader = new FileReader();
         // 以文本方式读取文件
-        reader.readAsText(this.upLoadJSON);
+        reader.readAsText(upLoadJSON);
         reader.onload = () => {
           // todo 需要校验
           if (reader.result !== "") {
             // 将文本（字符串）转化为JSON
-            this.upLoadJSONContent = JSON.parse(reader.result);
-            this.query = [];
+            upLoadJSONContent.value = JSON.parse(reader.result);
+            query.value = [];
             for (
               let index = 0;
-              index < this.upLoadJSONContent.length;
+              index < upLoadJSONContent.value.length;
               index++
             ) {
-              this.query[index] = this.upLoadJSONContent[index];
-              this.upLoadJSONContent[index] = null;
+              query[index] = upLoadJSONContent[index];
+              upLoadJSONContent[index] = null;
             }
-            this.setAlert("success", "导入字段配置文件成功", "primary");
+            setAlert("success", "导入字段配置文件成功", "primary");
           } else {
-            this.setAlert(
+            setAlert(
               "error",
               "上传字段配置文件失败，请不要导入自定义的.json文件",
               "danger"
@@ -561,30 +533,62 @@ export default {
           }
         };
       } else {
-        this.setAlert("info", "未导入文件", "info");
+        setAlert("info", "未导入文件", "info");
       }
-    },
-    showOverlayFunction() {
-      this.showOverlay = true;
-      if (this.query[1].name === "url" && this.query[1].content !== "") {
-        this.fileName = `${this.query[1].content}${dayjs().format(
+    };
+    const showOverlayFunction = () => {
+      showOverlay.value = true;
+      if (query.value[1].name === "url" && query.value[1].content !== "") {
+        fileName.value = `${query.value[1].content}${dayjs().format(
           "MM-DD-HH:mm:ss"
         )}`;
       } else {
-        this.fileName = `字段配置文件_${dayjs().format("MM-DD-HH:mm:ss")}`;
+        fileName.value = `字段配置文件_${dayjs().format("MM-DD-HH:mm:ss")}`;
       }
-    },
-    setAlert(type, content, color) {
-      if (!this.showAlert.value) {
-        this.showAlert.value = true;
-        this.showAlert.type = type;
-        this.showAlert.content = content;
-        this.showAlert.color = color;
+    };
+    const setAlert = (content, type, color) => {
+      if (!showAlert.value) {
+        showAlert.value = true;
+        showAlert.value.type = type;
+        showAlert.value.content = content;
+        showAlert.value.color = color;
         setTimeout(() => {
-          this.showAlert.value = false;
+          showAlert.value = false;
         }, 1500);
       }
-    },
+    };
+    return {
+      query,
+      fieldName,
+      showAlert,
+      upLoadJSON,
+      upLoadJSONContent,
+      showOverlay,
+      exportFileName,
+      deleteQuery,
+      fieldSplicer,
+      newField,
+      copyQuery,
+      toNewPage,
+      saveJSON,
+      importJSON,
+      showOverlayFunction,
+      setAlert,
+      mdAndUp,
+    };
   },
 };
 </script>
+<style>
+.v-card {
+  transition: 0.3s ease-in-out;
+}
+.v-card::-webkit-scrollbar {
+  display: none;
+}
+.v-alert {
+  position: fixed !important;
+  top: 1vh;
+  right: 1vw;
+}
+</style>
